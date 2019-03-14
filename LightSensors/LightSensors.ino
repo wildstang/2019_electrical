@@ -3,6 +3,14 @@
 //Positioned returned to the RIO
 unsigned int position;
 
+//last position returned to the RIO
+unsigned int lastPosition;
+
+//number of loops to average
+#define AVERAGE_LOOPS 3
+
+//deadband
+#define DEAD_BAND 10
 
 //light sensor minimum calibration value - debug only
 //#define MIN_LIGHT_CAL 0
@@ -35,8 +43,9 @@ char linePositionByte;
 
 void setup() 
 {
-  //Initialize Position
+  //Initialize Positions
   position = 0;
+  lastPosition = 0;
 
   //Define Serial speed baud
   Serial.begin(9600);
@@ -52,7 +61,36 @@ void setup()
 void loop() 
 {  
   // read calibrated sensor values and obtain a measure of the line position from 0 to 15000
-  position = lightSensors.readLine(sensorValues, QTR_EMITTERS_ON, true); 
+  //position = lightSensors.readLine(sensorValues, QTR_EMITTERS_ON, true); 
+
+
+  
+  //loop to sum position readings together
+  for( unsigned int i=0 ; i < AVERAGE_LOOPS ; i++)
+  {
+    position += readSensors();    
+  }
+
+  //average values
+  position = position / AVERAGE_LOOPS;
+
+  
+  //check if the differance from the last position to the current position is less than the deadband
+  if( DEAD_BAND < abs( position - lastPosition ) )
+  {
+    //If the values are in the deadband,then we return the last position 
+    linePositionByte = lastPosition / 60;
+  }
+  else
+  {
+    //If the values are NOT in the deadband, then we return the new position 
+    linePositionByte = position / 60;    
+
+    //set the last position to the current position;
+    lastPosition = position;
+  }
+  
+  
 
   /*
     for (unsigned char i = 0; i < 16; i++)
@@ -66,7 +104,7 @@ void loop()
    */  
      
    //char to write to the serial bus
-   linePositionByte = position / 60; 
+   //linePositionByte = position / 60; 
 
    //write the char to the serial bus
    Serial.write(linePositionByte);
@@ -74,6 +112,12 @@ void loop()
    //delay of 20ms makes this work
    delay(20);
 }
+
+unsigned int readSensors()
+{
+  return lightSensors.readLine(sensorValues, QTR_EMITTERS_ON, true);  
+}
+
 
 void manualCalibrate()
 {
