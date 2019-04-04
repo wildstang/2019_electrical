@@ -39,6 +39,8 @@ QTRSensorsRC lightSensors((unsigned char[]) {23, 25, 27, 29, 31, 33, 35, 37, 39,
 //Array of sensor values
 unsigned int sensorValues[16];
 
+char returnSensorValues[17];
+
 char linePositionByte; 
 
 void setup() 
@@ -106,8 +108,19 @@ void loop()
    //char to write to the serial bus
    //linePositionByte = position / 60; 
 
+
+    for (unsigned char i = 0; i < 16; i++)
+    {
+      returnSensorValues[i] = sensorValues[i] / 60;      
+    }
+
+    returnSensorValules[16] = linePositionByte
+
+    Serial.write(returnSensorValues, 17);   
+
+
    //write the char to the serial bus
-   Serial.write(linePositionByte);
+   //Serial.write(linePositionByte);
 
    //delay of 20ms makes this work
    delay(20);
