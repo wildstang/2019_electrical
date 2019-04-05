@@ -27,8 +27,8 @@ unsigned int lastPosition;
 
 
 // Midwest Real Field Calibration - 2019-3-8
-unsigned int CalibratedMinVals[] = {688, 424, 424, 604, 512, 176, 684, 2500, 768, 596, 768, 600, 768, 852, 764, 844}; 
-unsigned int CalibratedMaxVals[] = {1392, 768, 852, 1408, 944, 344, 1408, 2500, 1584, 1212, 1572, 1292, 1492, 1492, 1296, 1212}; 
+unsigned int CalibratedMinVals[] = {688, 424, 424, 604, 512, 176, 684, 700, 768, 596, 768, 600, 768, 852, 764, 844}; 
+unsigned int CalibratedMaxVals[] = {1392, 768, 852, 1408, 944, 344, 1408, 1500, 1584, 1212, 1572, 1292, 1492, 1492, 1296, 1212}; 
 
 
 // Midwest OLD Field Calibration - 2019-3-8 - Debug Only
@@ -140,7 +140,7 @@ void loop()
    //Serial.write(linePositionByte);
 
    //delay of 20ms makes this work
-   //delay(20);
+   delay(5);
 }
 
 unsigned int readSensors()
