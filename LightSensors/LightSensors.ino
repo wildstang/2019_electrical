@@ -9,6 +9,8 @@ unsigned int lastPosition;
 //number of loops to average
 #define AVERAGE_LOOPS 3
 
+#define SCALING_VALUE 2
+
 //deadband
 #define DEAD_BAND 10
 
@@ -25,8 +27,8 @@ unsigned int lastPosition;
 
 
 // Midwest Real Field Calibration - 2019-3-8
-unsigned int CalibratedMinVals[] = {280, 352, 724, 352, 280, 216, 280, 352, 352, 284, 420, 420, 280, 420, 496, 420}; 
-unsigned int CalibratedMaxVals[] = {348, 492, 956, 572, 416, 344, 416, 492, 492, 420, 648, 644, 420, 568, 648, 492}; 
+unsigned int CalibratedMinVals[] = {688, 424, 424, 604, 512, 176, 684, 2500, 768, 596, 768, 600, 768, 852, 764, 844}; 
+unsigned int CalibratedMaxVals[] = {1392, 768, 852, 1408, 944, 344, 1408, 2500, 1584, 1212, 1572, 1292, 1492, 1492, 1296, 1212}; 
 
 
 // Midwest OLD Field Calibration - 2019-3-8 - Debug Only
@@ -81,12 +83,12 @@ void loop()
   if( DEAD_BAND < abs( position - lastPosition ) )
   {
     //If the values are in the deadband,then we return the last position 
-    linePositionByte = lastPosition / 60;
+    linePositionByte = lastPosition / SCALING_VALUE;
   }
   else
   {
     //If the values are NOT in the deadband, then we return the new position 
-    linePositionByte = position / 60;    
+    linePositionByte = position / SCALING_VALUE;    
 
     //set the last position to the current position;
     lastPosition = position;
@@ -106,16 +108,17 @@ void loop()
    */  
      
    //char to write to the serial bus
-   //linePositionByte = position / 60; 
+   //linePositionByte = position / SCALING_VALUE; 
 
 
     for (unsigned char i = 0; i < 16; i++)
     {
-      returnSensorValues[i] = sensorValues[i] / 60;      
+      returnSensorValues[i] = sensorValues[i] / SCALING_VALUE;      
     }
 
-    returnSensorValules[16] = linePositionByte
+    returnSensorValues[16] = linePositionByte;
 
+    Serial.write(-1);
     Serial.write(returnSensorValues, 17);   
 
 
@@ -123,7 +126,7 @@ void loop()
    //Serial.write(linePositionByte);
 
    //delay of 20ms makes this work
-   delay(20);
+   //delay(20);
 }
 
 unsigned int readSensors()
