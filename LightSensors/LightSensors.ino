@@ -65,15 +65,16 @@ void setup()
 void loop() 
 {  
   // read calibrated sensor values and obtain a measure of the line position from 0 to 15000
-  //position = lightSensors.readLine(sensorValues, QTR_EMITTERS_ON, true); 
+  position = lightSensors.readLine(sensorValues, QTR_EMITTERS_ON, true); 
 
 
-  
+  /*
   //loop to sum position readings together
   for( unsigned int i=0 ; i < AVERAGE_LOOPS ; i++)
   {
     position += readSensors();    
   }
+  
 
   //average values
   position = position / AVERAGE_LOOPS;
@@ -94,7 +95,7 @@ void loop()
     lastPosition = position;
   }
   
-  
+  */
 
   /*
     for (unsigned char i = 0; i < 16; i++)
@@ -108,12 +109,25 @@ void loop()
    */  
      
    //char to write to the serial bus
-   //linePositionByte = position / SCALING_VALUE; 
+   linePositionByte = position / SCALING_VALUE; 
+
+   //clamp value to 254 max
+   if(linePositionByte > 254)
+   {
+      linePositionByte = 254;
+   }
 
 
     for (unsigned char i = 0; i < 16; i++)
     {
       returnSensorValues[i] = sensorValues[i] / SCALING_VALUE;      
+
+      //clamp value to 254 max
+      if(returnSensorValues[i] > 254)
+      {
+        returnSensorValues[i] = 254;
+      }
+      
     }
 
     returnSensorValues[16] = linePositionByte;
