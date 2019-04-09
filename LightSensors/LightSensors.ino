@@ -47,87 +47,96 @@ char linePositionByte;
 
 void setup() 
 {
-  //Initialize Positions
-  position = 0;
-  lastPosition = 0;
+    //Initialize Positions
+    position = 0;
+    lastPosition = 0;
 
-  //Define Serial speed baud
-  Serial.begin(9600);
-  Serial.print("Arduino Activated\n");
+    //Define Serial speed baud
+    Serial.begin(9600);
+    Serial.print("Arduino Activated\n");
 
-  //Manual calibration mode uses real time data to auotmaticly calibrate
-  //manualCalibrate(); 
+    //Manual calibration mode uses real time data to auotmaticly calibrate
+    //manualCalibrate(); 
 
-  //auto calibrate uses the calibration values previously measured and loaded into the arrays
-  autoCalibrate(CalibratedMaxVals, CalibratedMinVals);  
+    //auto calibrate uses the calibration values previously measured and loaded into the arrays
+    autoCalibrate(CalibratedMaxVals, CalibratedMinVals);  
 }
 
 void loop() 
 {  
-  // read calibrated sensor values and obtain a measure of the line position from 0 to 15000
-  position = lightSensors.readLine(sensorValues, QTR_EMITTERS_ON, true); 
+    // read calibrated sensor values and obtain a measure of the line position from 0 to 15000
+    position = lightSensors.readLine(sensorValues, QTR_EMITTERS_ON, true); 
 
 
-  /*
-  //loop to sum position readings together
-  for( unsigned int i=0 ; i < AVERAGE_LOOPS ; i++)
-  {
+    /*
+    //loop to sum position readings together
+    for( unsigned int i=0 ; i < AVERAGE_LOOPS ; i++)
+    {
     position += readSensors();    
-  }
-  
+    }
 
-  //average values
-  position = position / AVERAGE_LOOPS;
 
-  
-  //check if the differance from the last position to the current position is less than the deadband
-  if( DEAD_BAND < abs( position - lastPosition ) )
-  {
+    //average values
+    position = position / AVERAGE_LOOPS;
+
+
+    //check if the differance from the last position to the current position is less than the deadband
+    if( DEAD_BAND < abs( position - lastPosition ) )
+    {
     //If the values are in the deadband,then we return the last position 
     linePositionByte = lastPosition / SCALING_VALUE;
-  }
-  else
-  {
+    }
+    else
+    {
     //If the values are NOT in the deadband, then we return the new position 
     linePositionByte = position / SCALING_VALUE;    
 
     //set the last position to the current position;
     lastPosition = position;
-  }
-  
-  */
-
-  /*
-    for (unsigned char i = 0; i < 16; i++)
-    {
-      Serial.print(sensorValues[i]);
-      Serial.print(' ');
     }
-   Serial.println();
-   Serial.print("POSITION");
-   Serial.println(); 
-   */  
-     
-   //char to write to the serial bus
-   linePositionByte = position / SCALING_VALUE; 
 
-   //clamp value to 254 max
-   if(linePositionByte > 254)
-   {
-      linePositionByte = 254;
-   }
+     */
+
+    /*
+       for (unsigned char i = 0; i < 16; i++)
+       {
+       Serial.print(sensorValues[i]);
+       Serial.print(' ');
+       }
+       Serial.println();
+       Serial.print("POSITION");
+       Serial.println(); 
+     */  
+
+    // char to write to the serial bus
+    // FIXME: SCALING_VALUE probably should be different for linePositionByte.
+    linePositionByte = position / SCALING_VALUE; 
+
+    // Our protocol for messages from line sensor to Arduino:
+    // byte 0: 0xFF 
+    // bytes 1-16: values for light sensors (all <0xFF)
+    // byte 17: the QTRR library's determination of line position from the data
+    //          (<0xFF)
+    // So the only byte that is 0xFF is the start byte, allowing for easy
+    // synchronization.
+
+    //clamp value to 254 max
+    if(linePositionByte > 254)
+    {
+        linePositionByte = 254;
+    }
 
 
     for (unsigned char i = 0; i < 16; i++)
     {
-      returnSensorValues[i] = sensorValues[i] / SCALING_VALUE;      
+        returnSensorValues[i] = sensorValues[i] / SCALING_VALUE;      
 
-      //clamp value to 254 max
-      if(returnSensorValues[i] > 254)
-      {
-        returnSensorValues[i] = 254;
-      }
-      
+        //clamp value to 254 max
+        if(returnSensorValues[i] > 254)
+        {
+            returnSensorValues[i] = 254;
+        }
+
     }
 
     returnSensorValues[16] = linePositionByte;
@@ -136,62 +145,63 @@ void loop()
     Serial.write(returnSensorValues, 17);   
 
 
-   //write the char to the serial bus
-   //Serial.write(linePositionByte);
+    // write the char to the serial bus
+    // Serial.write(linePositionByte);
 
-   //delay of 20ms makes this work
-   delay(5);
+    // delay of 5ms --- this seems to help, don't take it out. Maybe it doesn't
+    // have to be 5 whole ms.
+    delay(5);
 }
 
 unsigned int readSensors()
 {
-  return lightSensors.readLine(sensorValues, QTR_EMITTERS_ON, true);  
+    return lightSensors.readLine(sensorValues, QTR_EMITTERS_ON, true);  
 }
 
 
 void manualCalibrate()
 {
-  digitalWrite(13, HIGH);    // turn on Arduino's LED to indicate we are in calibration mode
-  for (int i = 0; i < 400; i++)  // make the calibration take about 10 seconds
-  {
-    lightSensors.calibrate();
-  }
-  digitalWrite(13, LOW);     // turn off Arduino's LED to indicate we are through with calibration
+    digitalWrite(13, HIGH);    // turn on Arduino's LED to indicate we are in calibration mode
+    for (int i = 0; i < 400; i++)  // make the calibration take about 10 seconds
+    {
+        lightSensors.calibrate();
+    }
+    digitalWrite(13, LOW);     // turn off Arduino's LED to indicate we are through with calibration
 
-  // print the calibration minimum values measured when emitters were on
+    // print the calibration minimum values measured when emitters were on
     for (int i = 0; i < 16; i++)
-  {
-    Serial.print(lightSensors.calibratedMinimumOn[i]);
-    Serial.print(' ');
-  }
-  Serial.println();
+    {
+        Serial.print(lightSensors.calibratedMinimumOn[i]);
+        Serial.print(' ');
+    }
+    Serial.println();
 
-  // print the calibration maximum values measured when emitters were on
+    // print the calibration maximum values measured when emitters were on
     for (int i = 0; i < 16; i++)
-  {
-    Serial.print(lightSensors.calibratedMaximumOn[i]);
-    Serial.print(' ');
-  }
-  Serial.println();
+    {
+        Serial.print(lightSensors.calibratedMaximumOn[i]);
+        Serial.print(' ');
+    }
+    Serial.println();
 }
 
 void autoCalibrate(unsigned int *maxValsList, unsigned int *minValsList)
 {
-  lightSensors.calibratePreset(maxValsList, minValsList);
+    lightSensors.calibratePreset(maxValsList, minValsList);
 
-  // print the calibration minimum values measured when emitters were on
+    // print the calibration minimum values measured when emitters were on
     for (int i = 0; i < 16; i++)
-  {
-    Serial.print(lightSensors.calibratedMinimumOn[i]);
-    Serial.print(' ');
-  }
-  Serial.println();
+    {
+        Serial.print(lightSensors.calibratedMinimumOn[i]);
+        Serial.print(' ');
+    }
+    Serial.println();
 
-  // print the calibration maximum values measured when emitters were on
+    // print the calibration maximum values measured when emitters were on
     for (int i = 0; i < 16; i++)
-  {
-    Serial.print(lightSensors.calibratedMaximumOn[i]);
-    Serial.print(' ');
-  }
-  Serial.println();
+    {
+        Serial.print(lightSensors.calibratedMaximumOn[i]);
+        Serial.print(' ');
+    }
+    Serial.println();
 }
