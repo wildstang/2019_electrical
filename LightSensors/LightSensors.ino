@@ -20,20 +20,9 @@ unsigned int lastPosition;
 //light sensor minimum calibration value - debug only
 //#define MAX_LIGHT_CAL 15000
 
-//Light Calibration Arrays - debug only
-//unsigned int CalibratedMinVals[] = {MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL, MIN_LIGHT_CAL}; 
-//unsigned int CalibratedMaxVals[] = {MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL, MAX_LIGHT_CAL}; 
-
-
-
-// Midwest Real Field Calibration - 2019-3-8
-unsigned int CalibratedMinVals[] = {688, 424, 424, 604, 512, 176, 684, 700, 768, 596, 768, 600, 768, 852, 764, 844}; 
-unsigned int CalibratedMaxVals[] = {1392, 768, 852, 1408, 944, 344, 1408, 1500, 1584, 1212, 1572, 1292, 1492, 1492, 1296, 1212}; 
-
-
-// Midwest OLD Field Calibration - 2019-3-8 - Debug Only
-//unsigned int CalibratedMinVals[] = {424, 352, 644, 348, 216, 216, 216, 212, 356, 420, 420, 420, 420, 492, 700, 636}; 
-//unsigned int CalibratedMaxVals[] = {1072, 920, 1388, 772, 344, 416, 416, 344, 700, 784, 864, 852, 776, 1008, 1412, 1100}; 
+// Practice Field Calibration 2019-04-16
+unsigned int CalibratedMinVals[] = {736, 260, 348, 356, 180, 176, 268, 176, 440, 348, 260, 256, 348, 348, 348, 440, };
+unsigned int CalibratedMaxVals[] = {1280, 436, 528, 620, 344, 256, 436, 256, 712, 436, 428, 264, 436, 436, 436, 536, };
 
 //Light sensor array locations
 QTRSensorsRC lightSensors((unsigned char[]) {23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53}, 16);
